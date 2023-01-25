@@ -16,6 +16,7 @@ source("packages.R")
 
 #source("scripts/data_pulls/acs_api_query.R")
 load("data/acs_data/acs_data_2019_block group.Rdata")
+# data frame is called "data"
 
 #### Load NATA data ----
 
@@ -170,7 +171,7 @@ sq_miles %<>% st_set_geometry(NULL) %>% as.data.table() %>% setkey('GEOID') # ov
 
 ## IMPORTANT: Each of the steps below needs to be repeated at each buffer radius ##
 
-communities = st_buffer(facilities_map, dist=1*1609.34)
+communities = st_buffer(facilities_map, dist=1*1609.34) # 1 mi
 communities_3mi = st_buffer(facilities_map, dist=3*1609.34)
 communities_5mi = st_buffer(facilities_map, dist=5*1609.34)
 communities_10mi = st_buffer(facilities_map, dist=10*1609.34)
