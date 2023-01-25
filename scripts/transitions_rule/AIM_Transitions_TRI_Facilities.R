@@ -18,7 +18,7 @@ lapply(list.of.packages, library, character.only = TRUE)
 ###################################   HFC facilities
 ####################################################
 
-facilities_raw <- read_excel("data/hfc_facilities-4-8-22_w_additions V2_frsID_updatedlatlon.xlsx") %>%
+facilities_raw <- read_excel("data/Transitions_hfc_facilities-4-8-22_w_additions V2_frsID_updatedlatlon.xlsx") %>%
               rename(facility_id='FRSID',
                      ghg_quantity = `2020  GHG`,
                      FACILITY.NAME = `Facility Name`)

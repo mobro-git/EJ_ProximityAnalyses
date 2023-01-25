@@ -7,14 +7,14 @@ rm(list = ls())
 gc()
 
 # Load libraries
-source("scripts/packages.R")
+source("packages.R")
 
 # Load ACS data, pull from API if .Rdata file doesnt exist
-#source("acs_api_query.R")
+#source("scripts/data_pulls/acs_api_query.R")
 load("data/acs_data/acs_data_2019_block group.Rdata")
 
 # Load NATA data
-source("scripts/nata_data_pull.R")
+source("scripts/data_pulls/nata_data_pull.R")
 
 ## get urban areas for determining rural status
 urban_areas <- urban_areas()

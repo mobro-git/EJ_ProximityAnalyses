@@ -8,20 +8,20 @@ rm(list = ls())
 gc()
 
 #### Load libraries ----
-source("scripts/packages.R")
+source("packages.R")
 
 #### Load ACS data ----
 
-# source("acs_api_query.R") runs the script that queries the ACS API, pulls in the data, and saves it as an Rdata object. This step takes ~ 1-2 hrs and should only be done once. The acs_api_query.R script checks to see if the ACS data exists first. If it exists, it loads the data, if it does not exist, it runs the query. It is quicker, however, to directly load the data and skip sourcing the script, hence load("data/acs_data/acs_data_2019_block group.Rdata").
+# source("scripts/data_pulls/acs_api_query.R") runs the script that queries the ACS API, pulls in the data, and saves it as an Rdata object. This step takes ~ 1-2 hrs and should only be done once. The acs_api_query.R script checks to see if the ACS data exists first. If it exists, it loads the data, if it does not exist, it runs the query. It is quicker, however, to directly load the data and skip sourcing the script, hence load("data/acs_data/acs_data_2019_block group.Rdata").
 
-#source("acs_api_query.R")
+#source("scripts/data_pulls/acs_api_query.R")
 load("data/acs_data/acs_data_2019_block group.Rdata")
 
 #### Load NATA data ----
 
 # The nata_data_pull.R script downloads two nata datasets, total risk and respiratory hazard. The total risk data is located in the nata_data table, and respiratory hazard is located in the nata_data_resp table. Both tables are pulled in in this script. The script first checks to see if the data files are present, and only downloads if they are not. Then it pulls that data into your local environment, similarly to the acs_api_query.R script.
 
-source("scripts/nata_data_pull.R")
+source("scripts/data_pulls/nata_data_pull.R")
 
 ####  Download urban area shape files ----
 

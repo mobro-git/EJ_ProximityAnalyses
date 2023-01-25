@@ -2,21 +2,21 @@ rm(list = ls())
 gc()
 
 # Load libraries
-source("scripts/packages.R")
+source("packages.R")
 
 ### Allocation Rule
 
 # Allocation ACS and NATA Analysis
-source("AIM_Allocation.R")
+source("scripts/allocation_rule/AIM_Allocation.R")
 
 # Allocation TRI Proximity Analysis
-source("AIM_Allocation_TRI_Facilities.R")
+source("scripts/allocation_rule/AIM_Allocation_TRI_Facilities.R")
 
 ### Allocation Rule
 
 # Allocation ACS and NATA Analysis
-source("AIM_Transitions.R")
+source("scripts/transitions_rule/AIM_Transitions.R")
 
 # Allocation TRI Proximity Analysis
-source("AIM_Transitions_TRI_Facilities.R")
+source("scripts/transitions_rule/AIM_Transitions_TRI_Facilities.R")
 
