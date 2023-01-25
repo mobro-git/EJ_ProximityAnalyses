@@ -1,12 +1,5 @@
-## Written by: US EPA National Center for Environmental Economics; March 2021
 
-###################################################################################
-##############################     AIM EJ Analysis       ##########################
-###################################################################################
-
-####################################################
-############   Setup
-####################################################
+############   Setup ----
 
 rm(list = ls())
 gc()
@@ -38,15 +31,15 @@ facilities <- read_excel("data/Allocation_Final_list production facilities 2022.
   select(Longitude,Latitude,everything()) %>%
   filter(Label != "CHEMOURS CHAMBERS WORKS")
 
-facilities_lat_lon <- facilities %>% 
+facilities_lat_lon <- facilities %>%
   select(Longitude,Latitude,Label) %>%
   rename(lon = Longitude,
          lat = Latitude)
 
-facilities_sf = st_as_sf(facilities, 
-                      coords=c(x="Longitude",y="Latitude"), 
+facilities_sf = st_as_sf(facilities,
+                      coords=c(x="Longitude",y="Latitude"),
                       crs=4326) %>%
-  st_transform(3488) 
+  st_transform(3488)
 
 ### Indicating rural vs urban facilities. 1 = rural, 0 = urban
 
@@ -71,11 +64,11 @@ facilities_map <- facilities_sf %>%
 facilities_map_t <- usmap_transform(facilities_map)
 
 fac_map <- plot_usmap(include=c(.northeast_region,.south_region,.north_central_region), #,.west_north_central,.west_region,.west_south_central
-                  labels=TRUE, 
-                  fill = "#C5CFE3", 
+                  labels=TRUE,
+                  fill = "#C5CFE3",
                   alpha = 0.5) +
   ggrepel::geom_label_repel(data = facilities_map_t,
-                            aes(x = x, y = y, 
+                            aes(x = x, y = y,
                                 label = Label),
                             size = 5, alpha = 0.8,
                             label.r = unit(0.5, "lines"), label.size = 0.5,
@@ -111,13 +104,13 @@ shp = data_ct %>%
   st_transform(3488)
 
 ###### THIS STEP TAKES TIME
-# get the geography geometry from the acs data  
+# get the geography geometry from the acs data
 
 tr <- readRDS("data/tr.rds")
 
 # tr = shp %>% group_by(Tract) %>% summarize(geometry=st_union(geometry))
 # saveRDS(tr, "data/tr.rds")
-  
+
 tr_pts <- tr %>% st_centroid()
 
 ###### THIS STEP TAKES TIME
@@ -146,7 +139,7 @@ sq_miles %<>% st_set_geometry(NULL) %>% as.data.table() %>% setkey('GEOID')
 # draw a buffer around the facilities
 # buffer_dist is in miles so we need to multiply by 1609.34 meters/mile
 
-communities = st_buffer(facilities_map, dist=1*1609.34) 
+communities = st_buffer(facilities_map, dist=1*1609.34)
 
 communities_3mi = st_buffer(facilities_map, dist=3*1609.34)
 
@@ -178,9 +171,9 @@ facility_buffer_5mi <- st_intersection(facilities_map, buffer_5mi) %>% select(La
 facility_buffer_10mi <- st_intersection(facilities_map, buffer_10mi) %>% select(Label, GEOID) %>% st_set_geometry(NULL)
 
 # drop the geometry to work with the data alone
-table_full <- data_ct %>% 
+table_full <- data_ct %>%
   st_set_geometry(NULL) %>%
-  as.data.table() %>% 
+  as.data.table() %>%
   setkey('GEOID')
 
 table_1 <- table_full[sq_miles]
@@ -208,25 +201,25 @@ facility_demographics_3mi_pre <- merge(as.data.table(facilities_map), as.data.ta
 facility_demographics_5mi_pre <- merge(as.data.table(facilities_map), as.data.table(buffer_5mi),by="Label")
 facility_demographics_10mi_pre <- merge(as.data.table(facilities_map), as.data.table(buffer_10mi),by="Label")
 
-facility_demographics_1mi_mid <- merge(facility_demographics_1mi_pre, table_2, by="GEOID") %>% 
+facility_demographics_1mi_mid <- merge(facility_demographics_1mi_pre, table_2, by="GEOID") %>%
   select(Label,City,GHG_co2e,GEOID,sq_miles,rural.x,rural.y,pop,
          white,black,indian,asian,hispanic,income,pov50,pov99,
          total_risk,total_risk_resp) %>%
   rename(rural_facility = rural.x, rural_blockgroup = rural.y)
 
-facility_demographics_3mi_mid <- merge(facility_demographics_3mi_pre, table_2, by="GEOID") %>% 
+facility_demographics_3mi_mid <- merge(facility_demographics_3mi_pre, table_2, by="GEOID") %>%
   select(Label,City,GHG_co2e,GEOID,sq_miles,rural.x,rural.y,pop,
          white,black,indian,asian,hispanic,income,pov50,pov99,
          total_risk,total_risk_resp) %>%
   rename(rural_facility = rural.x, rural_blockgroup = rural.y)
 
-facility_demographics_5mi_mid <- merge(facility_demographics_5mi_pre, table_2, by="GEOID") %>% 
+facility_demographics_5mi_mid <- merge(facility_demographics_5mi_pre, table_2, by="GEOID") %>%
   select(Label,City,GHG_co2e,GEOID,sq_miles,rural.x,rural.y,pop,
          white,black,indian,asian,hispanic,income,pov50,pov99,
          total_risk,total_risk_resp) %>%
   rename(rural_facility = rural.x, rural_blockgroup = rural.y)
 
-facility_demographics_10mi_mid <- merge(facility_demographics_10mi_pre, table_2, by="GEOID") %>% 
+facility_demographics_10mi_mid <- merge(facility_demographics_10mi_pre, table_2, by="GEOID") %>%
   select(Label,City,GHG_co2e,GEOID,sq_miles,rural.x,rural.y,pop,
          white,black,indian,asian,hispanic,income,pov50,pov99,
          total_risk,total_risk_resp) %>%
@@ -235,8 +228,8 @@ facility_demographics_10mi_mid <- merge(facility_demographics_10mi_pre, table_2,
 facility_demographics_1mi <- facility_demographics_1mi_mid %>%
   group_by(Label,City,GHG_co2e) %>%
   mutate(
-    blockgroups_n = n(), 
-    sq_miles = sum(sq_miles, na.rm=TRUE), 
+    blockgroups_n = n(),
+    sq_miles = sum(sq_miles, na.rm=TRUE),
     pop = sum(pop, na.rm=TRUE),
     white = sum(white, na.rm=TRUE),
     black = sum(black, na.rm=TRUE),
@@ -244,24 +237,24 @@ facility_demographics_1mi <- facility_demographics_1mi_mid %>%
     asian = sum(asian, na.rm=TRUE),
     hispanic = sum(hispanic, na.rm=TRUE),
     income = mean(income, na.rm=TRUE),
-    pov50 = mean(pov50, na.rm=TRUE), 
-    pov99 = mean(pov99, na.rm=TRUE), 
-    total_risk = mean(total_risk, na.rm=TRUE), 
+    pov50 = mean(pov50, na.rm=TRUE),
+    pov99 = mean(pov99, na.rm=TRUE),
+    total_risk = mean(total_risk, na.rm=TRUE),
     total_risk_resp = mean(total_risk_resp, na.rm=TRUE)) %>%
   mutate(pop_sq_mile_1mi = pop/sq_miles,
-         rural_bg_pct = signif(sum(rural_blockgroup/blockgroups_n, na.rm=TRUE),2)) %>% 
+         rural_bg_pct = signif(sum(rural_blockgroup/blockgroups_n, na.rm=TRUE),2)) %>%
   ungroup() %>%
   select(Label,City,GHG_co2e,blockgroups_n,sq_miles,pop,pop_sq_mile_1mi,
          rural_facility,rural_bg_pct,white,black,indian,asian,hispanic,
-         income,pov50,pov99,total_risk,total_risk_resp) %>% 
+         income,pov50,pov99,total_risk,total_risk_resp) %>%
   distinct()
 
   write.xlsx(facility_demographics_1mi,"output/Allocation Rule/facility_data/allocation_rule_facility_demographics_1mi.xlsx", overwrite = TRUE)
 
 facility_demographics_3mi <- facility_demographics_3mi_mid %>%
   group_by(Label,City,GHG_co2e) %>%
-  mutate(blockgroups_n = n(), 
-         sq_miles = sum(sq_miles, na.rm=TRUE), 
+  mutate(blockgroups_n = n(),
+         sq_miles = sum(sq_miles, na.rm=TRUE),
          pop = sum(pop, na.rm=TRUE),
          white = sum(white, na.rm=TRUE),
          black = sum(black, na.rm=TRUE),
@@ -269,24 +262,24 @@ facility_demographics_3mi <- facility_demographics_3mi_mid %>%
          asian = sum(asian, na.rm=TRUE),
          hispanic = sum(hispanic, na.rm=TRUE),
          income = mean(income, na.rm=TRUE),
-         pov50 = mean(pov50, na.rm=TRUE), 
-         pov99 = mean(pov99, na.rm=TRUE), 
-         total_risk = mean(total_risk, na.rm=TRUE), 
+         pov50 = mean(pov50, na.rm=TRUE),
+         pov99 = mean(pov99, na.rm=TRUE),
+         total_risk = mean(total_risk, na.rm=TRUE),
          total_risk_resp = mean(total_risk_resp, na.rm=TRUE)) %>%
   mutate(pop_sq_mile_3mi = pop/sq_miles,
-         rural_bg_pct = signif(sum(rural_blockgroup/blockgroups_n, na.rm=TRUE),2)) %>% 
+         rural_bg_pct = signif(sum(rural_blockgroup/blockgroups_n, na.rm=TRUE),2)) %>%
   ungroup() %>%
   select(Label,City,GHG_co2e,blockgroups_n,sq_miles,pop,pop_sq_mile_3mi,
          rural_facility,rural_bg_pct,white,black,indian,asian,hispanic,
-         income,pov50,pov99,total_risk,total_risk_resp) %>% 
+         income,pov50,pov99,total_risk,total_risk_resp) %>%
   distinct()
 
 write.xlsx(facility_demographics_3mi,"output/Allocation Rule/facility_data/allocation_rule_facility_demographics_3mi.xlsx", overwrite = TRUE)
 
 facility_demographics_5mi <- facility_demographics_5mi_mid %>%
   group_by(Label,City,GHG_co2e) %>%
-  mutate(blockgroups_n = n(), 
-         sq_miles = sum(sq_miles, na.rm=TRUE), 
+  mutate(blockgroups_n = n(),
+         sq_miles = sum(sq_miles, na.rm=TRUE),
          pop = sum(pop, na.rm=TRUE),
          white = sum(white, na.rm=TRUE),
          black = sum(black, na.rm=TRUE),
@@ -294,24 +287,24 @@ facility_demographics_5mi <- facility_demographics_5mi_mid %>%
          asian = sum(asian, na.rm=TRUE),
          hispanic = sum(hispanic, na.rm=TRUE),
          income = mean(income, na.rm=TRUE),
-         pov50 = mean(pov50, na.rm=TRUE), 
-         pov99 = mean(pov99, na.rm=TRUE), 
-         total_risk = mean(total_risk, na.rm=TRUE), 
+         pov50 = mean(pov50, na.rm=TRUE),
+         pov99 = mean(pov99, na.rm=TRUE),
+         total_risk = mean(total_risk, na.rm=TRUE),
          total_risk_resp = mean(total_risk_resp, na.rm=TRUE)) %>%
   mutate(pop_sq_mile_5mi = pop/sq_miles,
-         rural_bg_pct = signif(sum(rural_blockgroup/blockgroups_n, na.rm=TRUE),2)) %>% 
+         rural_bg_pct = signif(sum(rural_blockgroup/blockgroups_n, na.rm=TRUE),2)) %>%
   ungroup() %>%
   select(Label,City,GHG_co2e,blockgroups_n,sq_miles,pop,pop_sq_mile_5mi,
          rural_facility,rural_bg_pct,white,black,indian,asian,hispanic,
-         income,pov50,pov99,total_risk,total_risk_resp) %>% 
+         income,pov50,pov99,total_risk,total_risk_resp) %>%
   distinct()
 
 write.xlsx(facility_demographics_5mi,"output/Allocation Rule/facility_data/allocation_rule_facility_demographics_5mi.xlsx", overwrite = TRUE)
 
 facility_demographics_10mi <- facility_demographics_10mi_mid %>%
   group_by(Label,City,GHG_co2e) %>%
-  mutate(blockgroups_n = n(), 
-         sq_miles = sum(sq_miles, na.rm=TRUE), 
+  mutate(blockgroups_n = n(),
+         sq_miles = sum(sq_miles, na.rm=TRUE),
          pop = sum(pop, na.rm=TRUE),
          white = sum(white, na.rm=TRUE),
          black = sum(black, na.rm=TRUE),
@@ -319,16 +312,16 @@ facility_demographics_10mi <- facility_demographics_10mi_mid %>%
          asian = sum(asian, na.rm=TRUE),
          hispanic = sum(hispanic, na.rm=TRUE),
          income = mean(income, na.rm=TRUE),
-         pov50 = mean(pov50, na.rm=TRUE), 
-         pov99 = mean(pov99, na.rm=TRUE), 
-         total_risk = mean(total_risk, na.rm=TRUE), 
+         pov50 = mean(pov50, na.rm=TRUE),
+         pov99 = mean(pov99, na.rm=TRUE),
+         total_risk = mean(total_risk, na.rm=TRUE),
          total_risk_resp = mean(total_risk_resp, na.rm=TRUE)) %>%
   mutate(pop_sq_mile_10mi = pop/sq_miles,
-         rural_bg_pct = signif(sum(rural_blockgroup/blockgroups_n, na.rm=TRUE),2)) %>% 
+         rural_bg_pct = signif(sum(rural_blockgroup/blockgroups_n, na.rm=TRUE),2)) %>%
   ungroup() %>%
   select(Label,City,GHG_co2e,blockgroups_n,sq_miles,pop,pop_sq_mile_10mi,
          rural_facility,rural_bg_pct,white,black,indian,asian,hispanic,
-         income,pov50,pov99,total_risk,total_risk_resp) %>% 
+         income,pov50,pov99,total_risk,total_risk_resp) %>%
   distinct()
 
 write.xlsx(facility_demographics_10mi,"output/Allocation Rule/facility_data/allocation_rule_facility_demographics_10mi.xlsx", overwrite = TRUE)
@@ -420,12 +413,12 @@ write.xlsx(list_of_datasets,"output/Allocation Rule/summary_tables/allocation_ru
 facilities_rural <- facilities_map %>% filter(rural == 1)
 
 for (i in 1:length(facilities_rural)){
-  
+
 facility <- paste0(facilities_rural[i,]$Label)
-communities = st_buffer(facilities_rural[i,],dist=1*1609.34) 
-communities_3mi = st_buffer(facilities_rural[i,],dist=3*1609.34) 
-communities_5mi = st_buffer(facilities_rural[i,],dist=5*1609.34) 
-communities_10mi = st_buffer(facilities_rural[i,],dist=10*1609.34) 
+communities = st_buffer(facilities_rural[i,],dist=1*1609.34)
+communities_3mi = st_buffer(facilities_rural[i,],dist=3*1609.34)
+communities_5mi = st_buffer(facilities_rural[i,],dist=5*1609.34)
+communities_10mi = st_buffer(facilities_rural[i,],dist=10*1609.34)
 
 # find the census geographies within the buffer around the facilities
 buffer = st_intersection(communities,shp) %>%
@@ -450,7 +443,7 @@ summary_table_sd = data.frame(Variable=desc_vars)
 #   summary_table_sd[v,"Overall (National Average) SD"] = sqrt(sum((a-mean(a, na.rm=TRUE))^2/(length(a)-1), na.rm=TRUE))
 # }
 
-# # get the state-level averages 
+# # get the state-level averages
 # state <- table %>% filter(State==facilities[i,]$`STATE`)
 # for (v in 1:length(comparison_vars)) {
 #   summary_table[v,"State Average"] = sum(state$pop*state[,comparison_vars[v]],na.rm=T)/sum(state$pop,na.rm=T)
@@ -524,51 +517,51 @@ write.xlsx(list_of_datasets,paste0("output/Allocation Rule/summary_tables/alloca
 facilities_urban <- facilities_map %>% filter(rural == 0)
 
 for (i in 1:length(facilities_urban)){
-  
+
   facility <- paste0(facilities_urban[i,]$Label)
-  communities = st_buffer(facilities_urban[i,],dist=1*1609.34) 
-  communities_3mi = st_buffer(facilities_urban[i,],dist=3*1609.34) 
-  communities_5mi = st_buffer(facilities_urban[i,],dist=5*1609.34) 
-  communities_10mi = st_buffer(facilities_urban[i,],dist=10*1609.34) 
-  
+  communities = st_buffer(facilities_urban[i,],dist=1*1609.34)
+  communities_3mi = st_buffer(facilities_urban[i,],dist=3*1609.34)
+  communities_5mi = st_buffer(facilities_urban[i,],dist=5*1609.34)
+  communities_10mi = st_buffer(facilities_urban[i,],dist=10*1609.34)
+
   # find the census geographies within the buffer around the facilities
   buffer = st_intersection(communities,shp) %>%
     select(GEOID,Tract,Label)
-  
+
   buffer_3mi = st_intersection(communities_3mi,shp) %>%
     select(GEOID,Tract,Label)
-  
+
   buffer_5mi = st_intersection(communities_5mi,shp) %>%
     select(GEOID,Tract,Label)
-  
+
   buffer_10mi = st_intersection(communities_10mi,shp) %>%
     select(GEOID,Tract,Label)
-  
+
   # get the national level averages
   summary_table = data.frame(Variable=desc_vars)
   summary_table_sd = data.frame(Variable=desc_vars)
-  
+
   # for (v in 1:length(comparison_vars)) {
   #   summary_table[v,"Overall (National Average)"] = sum(table$pop*table[,comparison_vars[v]],na.rm=T)/sum(table$pop,na.rm=T)
   #   a = (table$pop*table[,comparison_vars[v]])/table$pop
   #   summary_table_sd[v,"Overall (National Average) SD"] = sqrt(sum((a-mean(a, na.rm=TRUE))^2/(length(a)-1), na.rm=TRUE))
   # }
-  
-  # # get the state-level averages 
+
+  # # get the state-level averages
   # state <- table %>% filter(State==facilities[i,]$`STATE`)
   # for (v in 1:length(comparison_vars)) {
   #   summary_table[v,"State Average"] = sum(state$pop*state[,comparison_vars[v]],na.rm=T)/sum(state$pop,na.rm=T)
   #   a = (state$pop*state[,comparison_vars[v]])/state$pop
   #   summary_table_sd[v,"State Average SD"] = sqrt(sum((a-mean(a, na.rm=TRUE))^2/(length(a)-1), na.rm=TRUE))
   # }
-  
+
   # get the national rural area level averages
   for (v in 1:length(comparison_vars)) {
     summary_table[v,"National Average"] = sum(table$pop*table[,comparison_vars[v]],na.rm=T)/sum(table$pop,na.rm=T)
     a = (table$pop*table[,comparison_vars[v]])/table$pop
     summary_table_sd[v,"National Average SD"] = sqrt(sum((a-mean(a, na.rm=TRUE))^2/(length(a)-1), na.rm=TRUE))
   }
-  
+
   # get the rural area level averages in that state
   state <- table %>% filter(State==facilities_urban[i,]$`State`)
   for (v in 1:length(comparison_vars)) {
@@ -576,7 +569,7 @@ for (i in 1:length(facilities_urban)){
     a = (state$pop*state[,comparison_vars[v]])/state$pop
     summary_table_sd[v,"State Average SD"] = sqrt(sum((a-mean(a, na.rm=TRUE))^2/(length(a)-1), na.rm=TRUE))
   }
-  
+
   # get the population weighted averages around the production facilities
   local = table$GEOID %in% unique(buffer$GEOID)
   for (v in 1:length(comparison_vars)) {
@@ -584,7 +577,7 @@ for (i in 1:length(facilities_urban)){
     a = (table$pop[local]*table[local,comparison_vars[v]])/table$pop[local]
     summary_table_sd[v,"Within 1 mile of HFC production facility SD"] = sqrt(sum((a-mean(a, na.rm=TRUE))^2/(length(a)-1), na.rm=TRUE))
   }
-  
+
   # get the population weighted averages around the production facilities
   local_3mi = table$GEOID %in% unique(buffer_3mi$GEOID)
   for (v in 1:length(comparison_vars))  {
@@ -592,7 +585,7 @@ for (i in 1:length(facilities_urban)){
     a = (table$pop[local_3mi]*table[local_3mi,comparison_vars[v]])/table$pop[local_3mi]
     summary_table_sd[v,"Within 3 mile of HFC production facility SD"] = sqrt(sum((a-mean(a, na.rm=TRUE))^2/(length(a)-1), na.rm=TRUE))
   }
-  
+
   # get the population weighted averages around the production facilities
   local_5mi = table$GEOID %in% unique(buffer_5mi$GEOID)
   for (v in 1:length(comparison_vars))  {
@@ -600,7 +593,7 @@ for (i in 1:length(facilities_urban)){
     a = (table$pop[local_5mi]*table[local_5mi,comparison_vars[v]])/table$pop[local_5mi]
     summary_table_sd[v,"Within 5 mile of HFC production facility SD"] = sqrt(sum((a-mean(a, na.rm=TRUE))^2/(length(a)-1), na.rm=TRUE))
   }
-  
+
   # get the population weighted averages around the production facilities
   local_10mi = table$GEOID %in% unique(buffer_10mi$GEOID)
   for (v in 1:length(comparison_vars))  {
@@ -608,13 +601,13 @@ for (i in 1:length(facilities_urban)){
     a = (table$pop[local_10mi]*table[local_10mi,comparison_vars[v]])/table$pop[local_10mi]
     summary_table_sd[v,"Within 10 mile of HFC production facility SD"] = sqrt(sum((a-mean(a, na.rm=TRUE))^2/(length(a)-1), na.rm=TRUE))
   }
-  
+
   # only include two significant figures in the summary table
   summary_table[,2:7] = signif(summary_table[,2:7],2)
   summary_table_sd[,2:7] = signif(summary_table_sd[,2:7],2)
-  
+
   # export
   list_of_datasets <- list("Means" = summary_table, "Standard Deviations" = summary_table_sd)
   write.xlsx(list_of_datasets,paste0("output/Allocation Rule/summary_tables/allocation_rule_summary_tables_",facility,".xlsx"), overwrite = TRUE)
-  
+
 }
