@@ -83,7 +83,7 @@ fac_map <- plot_usmap(include=c(.northeast_region,.south_region,.north_central_r
 
 fac_map
 
-ggsave("output/Transitions Rule/transition_rule_facilities_map.png", fac_map, width = 10, height = 6)
+ggsave("output/Transitions Rule/acs2019/transition_rule_facilities_map.png", fac_map, width = 10, height = 6)
 
 ####################################################
 ############  Prep facilities for proximity analysis
@@ -239,7 +239,7 @@ facility_demographics_1mi <- facility_demographics_1mi_mid %>%
          income,pov50,pov99,total_risk,total_risk_resp) %>%
   distinct()
 
-  write.xlsx(facility_demographics_1mi,"output/Transitions Rule/facility_data/transition_rule_facility_demographics_1mi.xlsx", overwrite = TRUE)
+  write.xlsx(facility_demographics_1mi,"output/Transitions Rule/acs2019/facility_data/transition_rule_facility_demographics_1mi.xlsx", overwrite = TRUE)
 
 facility_demographics_3mi <- facility_demographics_3mi_mid %>%
   group_by(Label,City,GHG_co2e) %>%
@@ -264,7 +264,7 @@ facility_demographics_3mi <- facility_demographics_3mi_mid %>%
          income,pov50,pov99,total_risk,total_risk_resp) %>%
   distinct()
 
-write.xlsx(facility_demographics_3mi,"output/Transitions Rule/facility_data/transition_rule_facility_demographics_3mi.xlsx", overwrite = TRUE)
+write.xlsx(facility_demographics_3mi,"output/Transitions Rule/acs2019/facility_data/transition_rule_facility_demographics_3mi.xlsx", overwrite = TRUE)
 
 facility_demographics_5mi <- facility_demographics_5mi_mid %>%
   group_by(Label,City,GHG_co2e) %>%
@@ -289,7 +289,7 @@ facility_demographics_5mi <- facility_demographics_5mi_mid %>%
          income,pov50,pov99,total_risk,total_risk_resp) %>%
   distinct()
 
-write.xlsx(facility_demographics_5mi,"output/Transitions Rule/facility_data/transition_rule_facility_demographics_5mi.xlsx", overwrite = TRUE)
+write.xlsx(facility_demographics_5mi,"output/Transitions Rule/acs2019/facility_data/transition_rule_facility_demographics_5mi.xlsx", overwrite = TRUE)
 
 facility_demographics_10mi <- facility_demographics_10mi_mid %>%
   group_by(Label,City,GHG_co2e) %>%
@@ -314,7 +314,7 @@ facility_demographics_10mi <- facility_demographics_10mi_mid %>%
          income,pov50,pov99,total_risk,total_risk_resp) %>%
   distinct()
 
-write.xlsx(facility_demographics_10mi,"output/Transitions Rule/facility_data/transition_rule_facility_demographics_10mi.xlsx", overwrite = TRUE)
+write.xlsx(facility_demographics_10mi,"output/Transitions Rule/acs2019/facility_data/transition_rule_facility_demographics_10mi.xlsx", overwrite = TRUE)
 
 ####################################################
 ########################  Conduct proximity analysis
@@ -394,7 +394,7 @@ summary_table_all_sd <- summary_table_sd
 
 # export
 list_of_datasets <- list("Means" = summary_table_all, "Standard Deviations" = summary_table_all_sd)
-write.xlsx(list_of_datasets,"output/Transitions Rule/summary_tables/transition_rule_summary_tables_national.xlsx", overwrite = TRUE)
+write.xlsx(list_of_datasets,"output/Transitions Rule/acs2019/summary_tables/transition_rule_summary_tables_national.xlsx", overwrite = TRUE)
 
 ####################################################
 ###############  Conduct proximity analysis by plant - rural
@@ -495,7 +495,7 @@ summary_table_sd[,2:7] = signif(summary_table_sd[,2:7],2)
 
 # export
 list_of_datasets <- list("Means" = summary_table, "Standard Deviations" = summary_table_sd)
-write.xlsx(list_of_datasets,paste0("output/Transitions Rule/summary_tables/transition_rule_summary_tables_",facility,".xlsx"), overwrite = TRUE)
+write.xlsx(list_of_datasets,paste0("output/Transitions Rule/acs2019/summary_tables/transition_rule_summary_tables_",facility,".xlsx"), overwrite = TRUE)
 
 }
 
@@ -598,6 +598,6 @@ for (i in 1:length(facilities_urban)){
 
   # export
   list_of_datasets <- list("Means" = summary_table, "Standard Deviations" = summary_table_sd)
-  write.xlsx(list_of_datasets,paste0("output/Transitions Rule/summary_tables/transition_rule_summary_tables_",facility,".xlsx"), overwrite = TRUE)
+  write.xlsx(list_of_datasets,paste0("output/Transitions Rule/acs2019/summary_tables/transition_rule_summary_tables_",facility,".xlsx"), overwrite = TRUE)
 
 }
